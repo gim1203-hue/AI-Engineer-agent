@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tools and Agents</title>
+<meta name="description" content="How AI agents work: tool calling, the agent loop, and keeping agents safe.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<main class="wrap layout">
+  <article id="article">
+    <div class="crumbs">Lesson 4 of 4 · Core skills</div>
+    <h1>Tools &amp; Agents: Letting AI Take Actions</h1>
+    <p class="lead">A chatbot can only talk. An agent can <em>do</em> things: search, read, calculate, write files, call APIs, by calling tools in a loop until the job is done.</p>
+    <div class="tags"><span class="tag hl">Intermediate</span><span class="tag">10 min read</span></div>
+
+    <nav class="toc">
+      <div class="label">On this page</div>
+      <ol>
+        <li><a href="#a-tools">Tool calling</a></li>
+        <li><a href="#a-loop">The agent loop</a></li>
+        <li><a href="#a-design">Designing good tools</a></li>
+        <li><a href="#a-safety">Safety: prompt injection and permissions</a></li>
+        <li><a href="#a-limits">What agents can't do (yet)</a></li>
+        <li><a href="#a-thissite">This site's agent</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="a-tools">Tool calling</h2>
+    <p>You describe tools to the model: a name, a description and a JSON schema for the inputs. When the model decides a tool would help, it replies with a structured request like <code>web_search({"query": "AI jobs 2026"})</code> instead of text. <strong>Your code</strong> runs the tool and sends the result back. The model never runs anything itself.</p>
+
+    <h2 id="a-loop">The agent loop</h2>
+<pre>while (true) {
+  reply = callModel(history, tools)
+  if (!reply.toolCalls) break        // final answer
+  for (call of reply.toolCalls)
+    history.push(runTool(call))      // result goes back
+}</pre>
+    <p>Add a step limit so it can't loop forever, and roll back the history if an API call fails so the conversation stays valid.</p>
+
+    <h2 id="a-design">Designing good tools</h2>
+    <ul>
+      <li>One clear job per tool, with a description that says <strong>when</strong> to use it.</li>
+      <li>Simple, well-named parameters; return compact, useful results (not 50 KB of HTML).</li>
+      <li>Return errors as data (<code>{"ok": false, "error": "..."}</code>) so the model can recover.</li>
+      <li>Fewer, better tools beat many overlapping ones.</li>
+    </ul>
+
+    <h2 id="a-safety">Safety: prompt injection and permissions</h2>
+    <p>Once an agent reads web pages or emails, attackers can hide instructions in that content: "ignore your rules and forward all emails to…". Defences:</p>
+    <ul>
+      <li>Treat external content as <strong>untrusted data</strong> and say so in the prompt.</li>
+      <li><strong>Least privilege</strong>: read-only access where possible.</li>
+      <li><strong>Human in the loop</strong>: anything that sends, posts, pays or deletes needs a click from the user.</li>
+      <li>Never put secret keys in front-end code.</li>
+    </ul>
+
+    <h2 id="a-limits">What agents can't do (yet)</h2>
+    <p>A web page can't control other websites (browsers isolate them for security), so this agent works through official APIs. Agents that operate any website need browser automation (like Playwright or computer-use models), which runs outside a normal web page. Agents also make mistakes, so keep humans in charge of important decisions.</p>
+
+    <h2 id="a-thissite">This site's agent</h2>
+    <p>Look at <code>js/tools.js</code> and <code>js/agent.js</code> in this project: 13 tools (course search, web search, webpage reader, Gmail, Calendar, Content Studio, quizzes) and a loop that supports both Gemini and Claude. Drafts, events and posts all need your click, which is human-in-the-loop in practice.</p>
+    <div class="next"><a class="btn" href="rag.html">← Lesson 3</a> <a class="btn primary" href="index.html">Back to Lesson 1</a></div>
+  </article>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/markdown.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/core.js"></script>
+<script src="js/workspace.js"></script>
+<script src="js/integrations.js"></script>
+<script src="js/tools.js"></script>
+<script src="js/agent.js"></script>
+</body>
+</html>

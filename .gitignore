@@ -1,0 +1,13 @@
+# Never commit secrets
+.env
+.env.*
+.dev.vars
+*.key
+
+# Cloudflare / Node
+worker/.wrangler/
+node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db

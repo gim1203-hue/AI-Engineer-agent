@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAG Explained Simply</title>
+<meta name="description" content="Retrieval-augmented generation: how to make AI answer from your own documents.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<main class="wrap layout">
+  <article id="article">
+    <div class="crumbs">Lesson 3 of 4 · Core skills</div>
+    <h1>RAG: Making AI Answer From Your Own Data</h1>
+    <p class="lead">Models don't know your company docs, your notes or yesterday's news. Retrieval-augmented generation (RAG) fixes that by finding the right information first and handing it to the model.</p>
+    <div class="tags"><span class="tag hl">Beginner–Intermediate</span><span class="tag">9 min read</span></div>
+
+    <nav class="toc">
+      <div class="label">On this page</div>
+      <ol>
+        <li><a href="#r-what">What RAG is</a></li>
+        <li><a href="#r-pipeline">The RAG pipeline</a></li>
+        <li><a href="#r-chunking">Chunking documents</a></li>
+        <li><a href="#r-embeddings">Embeddings and vector search</a></li>
+        <li><a href="#r-quality">Making RAG good</a></li>
+        <li><a href="#r-thissite">RAG on this website</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="r-what">What RAG is</h2>
+    <p>RAG is an open-book exam for the model. Instead of hoping the model memorised the answer, your code <strong>retrieves</strong> relevant passages from your documents and puts them in the prompt, then the model <strong>generates</strong> an answer grounded in them, ideally with citations.</p>
+    <p>It reduces hallucinations, keeps answers up to date (just update the documents) and lets you use private data without training a model.</p>
+
+    <h2 id="r-pipeline">The RAG pipeline</h2>
+    <div class="stack">
+      <div><b>1. Ingest</b><small>load PDFs, web pages, docs; clean the text</small></div>
+      <div><b>2. Chunk</b><small>split into passages of a few hundred words</small></div>
+      <div><b>3. Embed + index</b><small>turn each chunk into a vector and store it</small></div>
+      <div class="me"><b>4. Retrieve</b><small>find the chunks most similar to the user's question</small></div>
+      <div><b>5. Generate</b><small>prompt = instructions + retrieved chunks + question</small></div>
+    </div>
+
+    <h2 id="r-chunking">Chunking documents</h2>
+    <p>Chunks that are too big waste context and dilute relevance; too small and they lose meaning. A common start is 200–500 words with a little overlap, split on natural boundaries like headings and paragraphs. Keep metadata (title, URL, date) with each chunk so you can cite sources.</p>
+
+    <h2 id="r-embeddings">Embeddings and vector search</h2>
+    <p>An <strong>embedding</strong> is a list of numbers that captures a text's meaning. Texts about similar things have vectors that point in similar directions. A <strong>vector database</strong> (or a simple library) finds the chunks closest to the question's embedding. That's semantic search: "refund" can match "money back".</p>
+    <p>Many production systems combine this with keyword search (<strong>hybrid search</strong>) and then <strong>re-rank</strong> the top results for better precision.</p>
+
+    <h2 id="r-quality">Making RAG good</h2>
+    <ul>
+      <li>Evaluate retrieval separately: did the right chunk appear in the top 5?</li>
+      <li>Tell the model to answer only from the provided context and say when it isn't there.</li>
+      <li>Show sources so users can check.</li>
+      <li>Watch for stale or duplicate documents; garbage in, garbage out.</li>
+    </ul>
+
+    <h2 id="r-thissite">RAG on this website</h2>
+    <p>The agent's <code>search_course</code> tool is a tiny RAG system: it splits every lesson into sections (chunks), scores them by keyword overlap with your question (retrieval), and gives the best ones to the model (generation). Upgrading it to embeddings would be a great portfolio project.</p>
+    <div class="next"><a class="btn" href="prompting.html">← Lesson 2</a> <a class="btn primary" href="agents.html">Next: Tools &amp; agents →</a></div>
+  </article>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/markdown.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/core.js"></script>
+<script src="js/workspace.js"></script>
+<script src="js/integrations.js"></script>
+<script src="js/tools.js"></script>
+<script src="js/agent.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prompt Engineering Basics</title>
+<meta name="description" content="How to write clear prompts and give AI models the right context.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<main class="wrap layout">
+  <article id="article">
+    <div class="crumbs">Lesson 2 of 4 · Core skills</div>
+    <h1>Prompt &amp; Context Engineering: Getting Reliable Answers</h1>
+    <p class="lead">A model can only work with what you give it. Prompt engineering is writing clear instructions; context engineering is choosing exactly what information goes into the model's context window.</p>
+    <div class="tags"><span class="tag hl">Beginner</span><span class="tag">8 min read</span></div>
+
+    <nav class="toc">
+      <div class="label">On this page</div>
+      <ol>
+        <li><a href="#p-what">What a prompt really is</a></li>
+        <li><a href="#p-anatomy">Anatomy of a good prompt</a></li>
+        <li><a href="#p-examples">Examples (few-shot prompting)</a></li>
+        <li><a href="#p-context">Context engineering</a></li>
+        <li><a href="#p-structured">Getting structured output</a></li>
+        <li><a href="#p-mistakes">Common mistakes</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="p-what">What a prompt really is</h2>
+    <p>A prompt is everything the model reads before it answers: the <strong>system prompt</strong> (standing instructions set by the developer), the <strong>conversation history</strong>, any <strong>documents or tool results</strong> you include, and the user's latest message. The model has no memory beyond this. If it isn't in the context, the model doesn't know it.</p>
+    <p>Treat the model like a very smart new colleague on their first day: talented, but with zero background on your project. Spell out what you want.</p>
+
+    <h2 id="p-anatomy">Anatomy of a good prompt</h2>
+    <ul>
+      <li><strong>Role and goal</strong>: who the model is acting as and what success looks like.</li>
+      <li><strong>Context</strong>: the facts, documents or data it needs.</li>
+      <li><strong>Instructions</strong>: clear steps or rules, positive ("do X") rather than only negative.</li>
+      <li><strong>Format</strong>: length, structure, tone. For example "3 bullet points, under 50 words".</li>
+      <li><strong>Edge cases</strong>: what to do when information is missing ("say you don't know").</li>
+    </ul>
+<pre>System: You are a support assistant for a bike shop.
+Answer ONLY from the policy below. If the answer isn't
+there, say "I'll pass this to a human."
+Reply in 2-3 friendly sentences.
+
+&lt;policy&gt;
+Returns accepted within 30 days with receipt...
+&lt;/policy&gt;</pre>
+
+    <h2 id="p-examples">Examples (few-shot prompting)</h2>
+    <p>Showing 2–5 examples of input → ideal output is often more effective than describing the format in words. The model copies the pattern: tone, length and structure. Use varied examples so it doesn't over-copy one detail.</p>
+
+    <h2 id="p-context">Context engineering</h2>
+    <p>Context windows are large but not free: more tokens means more cost, more latency, and sometimes worse focus. Context engineering is deciding what goes in:</p>
+    <ul>
+      <li>Retrieve only the <strong>relevant</strong> documents (that's RAG, the next lesson).</li>
+      <li>Summarise long conversation history instead of resending everything.</li>
+      <li>Put the most important instructions at the start and repeat key constraints at the end of long prompts.</li>
+      <li>Separate data from instructions with clear tags like <code>&lt;document&gt;</code>, and tell the model the data is untrusted. This defends against <strong>prompt injection</strong>.</li>
+    </ul>
+
+    <h2 id="p-structured">Getting structured output</h2>
+    <p>Apps often need JSON, not prose. Ask for an exact schema, give an example, and use the API's structured-output or tool-calling features where available. Always validate the result in code; never assume it's perfect.</p>
+
+    <h2 id="p-mistakes">Common mistakes</h2>
+    <ul>
+      <li>Vague goals ("make it better") with no success criteria.</li>
+      <li>Testing a prompt on one example and calling it done. Build a small eval set of 20+ cases.</li>
+      <li>Stuffing the whole database into the prompt instead of retrieving what's relevant.</li>
+      <li>Mixing untrusted user or web content with instructions.</li>
+    </ul>
+    <div class="next"><a class="btn" href="index.html">← Lesson 1</a> <a class="btn primary" href="rag.html">Next: RAG →</a></div>
+  </article>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/markdown.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/core.js"></script>
+<script src="js/workspace.js"></script>
+<script src="js/integrations.js"></script>
+<script src="js/tools.js"></script>
+<script src="js/agent.js"></script>
+</body>
+</html>
