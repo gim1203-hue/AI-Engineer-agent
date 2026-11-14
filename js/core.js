@@ -46,8 +46,13 @@ window.App = window.App || {};
       const p = store.get("ai_provider") || C.defaultProvider;
       return App.PROVIDERS[p] ? p : "gemini";
     },
-    key: (p = App.cfg.provider()) => store.get(p + "_key") || "",
-    model: (p = App.cfg.provider()) => store.get(p + "_model") || App.PROVIDERS[p].models[0][0],
+    // The visitor's own key (from Settings)
+    userKey: (p = App.cfg.provider()) => store.get(p + "_key") || "",
+    // The key actually used: the visitor's own, else the site's shared Gemini key
+    key: (p = App.cfg.provider()) => App.cfg.userKey(p) || (p === "gemini" ? C.publicGeminiKey || "" : ""),
+    usingSharedKey: (p = App.cfg.provider()) => p === "gemini" && !App.cfg.userKey(p) && !!C.publicGeminiKey,
+    model: (p = App.cfg.provider()) => store.get(p + "_model")
+      || (App.cfg.usingSharedKey(p) && C.publicGeminiModel) || App.PROVIDERS[p].models[0][0],
     backend: () => trimSlash(store.get("backend_url") || C.backendUrl),
     reader: () => store.get("reader_url") || (App.cfg.backend() ? App.cfg.backend() + "/read?url={url_encoded}" : App.DEFAULT_READER),
     googleClientId: () => store.get("google_client_id") || C.googleClientId || "",
@@ -109,12 +114,13 @@ window.App = window.App || {};
 
     function fillProviderFields(p) {
       const c = App.PROVIDERS[p];
-      $("keyLabel").textContent = c.label + (App.cfg.backend() ? " (optional)" : "");
-      keyInput.placeholder = c.placeholder;
+      const shared = App.cfg.backend() || (p === "gemini" && C.publicGeminiKey);
+      $("keyLabel").textContent = c.label + (shared ? " (optional)" : "");
+      keyInput.placeholder = shared ? "Leave empty to use this site's shared key" : c.placeholder;
       $("providerHelp").innerHTML = c.help;
       modelSelect.innerHTML = "";
       for (const [value, text] of c.models) modelSelect.add(new Option(text, value));
-      keyInput.value = App.cfg.key(p);
+      keyInput.value = App.cfg.userKey(p);
       modelSelect.value = App.cfg.model(p);
     }
     providerSelect.onchange = () => fillProviderFields(providerSelect.value);
@@ -122,7 +128,7 @@ window.App = window.App || {};
     App.openSettings = () => {
       providerSelect.value = App.cfg.provider();
       fillProviderFields(providerSelect.value);
-      $("backendNote").hidden = !App.cfg.backend();
+      $("backendNote").hidden = !(App.cfg.backend() || C.publicGeminiKey);
       $("backendUrl").value = store.get("backend_url") || "";
       $("backendUrl").placeholder = C.backendUrl || "https://ai-guide-reader.you.workers.dev";
       $("readerUrl").value = store.get("reader_url") || "";

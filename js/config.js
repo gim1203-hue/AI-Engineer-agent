@@ -11,6 +11,15 @@ window.APP_CONFIG = {
   defaultProvider: "gemini",
   googleClientId: "", // optional: your Google OAuth Client ID so visitors don't have to paste one
 
+  /* Shared Gemini key so visitors can use the agent without their own key.
+   * ⚠ This key is PUBLIC: anyone can read it in this file. Protect it in Google Cloud Console →
+   * APIs & Services → Credentials → this key:
+   *   • Application restrictions → Websites → https://gim1203-hue.github.io/*
+   *   • API restrictions → Generative Language API only
+   * Never enable billing on this key's project. Visitors who add their own key in Settings use theirs instead. */
+  publicGeminiKey: "AQ.Ab8RN6IvvSwO7zNJJeHhz1GFoa9wwGEazXACwhYn4XO3O4KkNw",
+  publicGeminiModel: "gemini-flash-lite-latest", // Flash-Lite has the highest free limits
+
   // The course: every lesson page the agent can search. Add new pages here.
   lessons: [
     { file: "index.html", title: "What is an AI engineer?" },

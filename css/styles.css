@@ -42,8 +42,13 @@ html { scroll-padding-top: 110px; }
 .btn.small { font-size: 11px; padding: 3px 8px; }
 
 /* Layout */
-.layout { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 32px; padding: 32px 0 64px; }
-@media (max-width: 960px) { .layout { grid-template-columns: 1fr; } }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 32px; padding-top: 32px; padding-bottom: 64px; }
+@media (max-width: 960px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  h1 { font-size: 26px; overflow-wrap: anywhere; }
+  .layout { padding-top: 20px; }
+  article { overflow-wrap: break-word; }
+}
 
 .crumbs, .label { font-family: var(--mono); font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
 h1 { font-family: var(--mono); font-size: clamp(26px, 4vw, 40px); line-height: 1.15; margin: 12px 0; }
