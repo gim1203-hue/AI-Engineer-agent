@@ -73,18 +73,12 @@ Style: concise (under ~150 words unless asked), Markdown allowed (bold, bullet l
         else history.push({ role: "user", parts: [{ text }] });
       },
       async step() {
-        const res = await fetch(App.ai.geminiUrl(`/v1beta/models/${encodeURIComponent(cfg.model())}:generateContent`), {
-          method: "POST",
-          headers: App.ai.geminiHeaders(),
-          body: JSON.stringify({
-            systemInstruction: { parts: [{ text: systemPrompt() }] },
-            contents: history,
-            tools: [{ functionDeclarations: toolList() }],
-            generationConfig: { maxOutputTokens: 4096 },
-          }),
+        const data = await App.ai.geminiGenerate({
+          systemInstruction: { parts: [{ text: systemPrompt() }] },
+          contents: history,
+          tools: [{ functionDeclarations: toolList() }],
+          generationConfig: { maxOutputTokens: 4096 },
         });
-        if (!res.ok) throw await App.errorFrom(res);
-        const data = await res.json();
         const content = data.candidates?.[0]?.content;
         if (!content?.parts?.length) throw new Error("Empty reply (" + (data.promptFeedback?.blockReason || data.candidates?.[0]?.finishReason || "unknown") + ")");
         history.push({ role: "model", parts: content.parts }); // keep as-is: may carry thought signatures
@@ -395,7 +389,8 @@ Style: concise (under ~150 words unless asked), Markdown allowed (bold, bullet l
       } catch (err) {
         history = JSON.parse(checkpoint); // roll back so the conversation stays valid
         let hint = "";
-        if (/credit|billing|quota|exhausted|429/i.test(err.message)) hint = "\nTip: use the free Google Gemini provider in ⚙ Settings, or wait a minute if you hit the free rate limit.";
+        if (/high demand|overloaded|unavailable|503/i.test(err.message)) hint = "\nGoogle's AI is busy right now. Wait a minute and send your message again.";
+        else if (/credit|billing|quota|exhausted|429/i.test(err.message)) hint = "\nTip: use the free Google Gemini provider in ⚙ Settings, or wait a minute if you hit the free rate limit.";
         else if (/auth|key|401|403|permission/i.test(err.message)) {
           // A key saved in Settings overrides the site's shared key, and it's saved per address
           // (localhost and 127.0.0.1 are different), so an old or mistyped key breaks only one of them.

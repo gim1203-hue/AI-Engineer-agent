@@ -74,6 +74,28 @@ window.App = window.App || {};
       if (App.cfg.key("gemini")) h["x-goog-api-key"] = App.cfg.key("gemini");
       return h;
     },
+    // Calls Gemini generateContent. When Google says a model is overloaded (503/500) or out of
+    // quota (429), it waits briefly and retries, then tries the other Gemini model.
+    async geminiGenerate(body) {
+      const chosen = App.cfg.model("gemini");
+      // Pinned versions as last resorts: they're often free when the "-latest" aliases are busy
+      const backups = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"];
+      const models = [...new Set([chosen, ...App.PROVIDERS.gemini.models.map((m) => m[0]), ...backups])];
+      let lastErr;
+      for (const model of models) {
+        for (let attempt = 0; attempt < 2; attempt++) {
+          const res = await fetch(App.ai.geminiUrl(`/v1beta/models/${encodeURIComponent(model)}:generateContent`), {
+            method: "POST", headers: App.ai.geminiHeaders(), body: JSON.stringify(body),
+          });
+          if (res.ok) return res.json();
+          lastErr = await App.errorFrom(res);
+          if (![429, 500, 503].includes(res.status)) throw lastErr; // e.g. bad key: retrying won't help
+          if (attempt === 0 && res.status !== 429) await new Promise((r) => setTimeout(r, 1500));
+          else break; // move on to the next model
+        }
+      }
+      throw lastErr;
+    },
     claudeUrl() {
       const useBackend = !App.cfg.key("claude") && App.cfg.backend();
       return (useBackend ? App.cfg.backend() + "/claude" : "https://api.anthropic.com") + "/v1/messages";

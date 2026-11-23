@@ -44,13 +44,7 @@
     const prompt = `Search the web and answer concisely with the key facts, numbers and dates. Query: ${query}`;
 
     if (cfg.provider() === "gemini") {
-      const res = await fetch(App.ai.geminiUrl(`/v1beta/models/${encodeURIComponent(cfg.model("gemini"))}:generateContent`), {
-        method: "POST",
-        headers: App.ai.geminiHeaders(),
-        body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }], tools: [{ google_search: {} }] }),
-      });
-      if (!res.ok) throw await App.errorFrom(res);
-      const data = await res.json();
+      const data = await App.ai.geminiGenerate({ contents: [{ role: "user", parts: [{ text: prompt }] }], tools: [{ google_search: {} }] });
       const cand = data.candidates?.[0];
       const answer = (cand?.content?.parts || []).filter((p) => p.text && !p.thought).map((p) => p.text).join("").trim();
       const sources = (cand?.groundingMetadata?.groundingChunks || []).map((c) => c.web).filter(Boolean)
