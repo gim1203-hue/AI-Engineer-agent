@@ -50,7 +50,8 @@ window.App = window.App || {};
     userKey: (p = App.cfg.provider()) => store.get(p + "_key") || "",
     // The key actually used: the visitor's own, else the site's shared Gemini key
     key: (p = App.cfg.provider()) => App.cfg.userKey(p) || (p === "gemini" ? C.publicGeminiKey || "" : ""),
-    usingSharedKey: (p = App.cfg.provider()) => p === "gemini" && !App.cfg.userKey(p) && !!C.publicGeminiKey,
+    // True when Gemini runs on the site owner's quota: the shared key, or the backend worker
+    usingSharedKey: (p = App.cfg.provider()) => p === "gemini" && !App.cfg.userKey(p) && !!(C.publicGeminiKey || App.cfg.backend()),
     model: (p = App.cfg.provider()) => store.get(p + "_model")
       || (App.cfg.usingSharedKey(p) && C.publicGeminiModel) || App.PROVIDERS[p].models[0][0],
     backend: () => trimSlash(store.get("backend_url") || C.backendUrl),

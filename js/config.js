@@ -7,7 +7,7 @@
  */
 window.APP_CONFIG = {
   siteName: "AI/GUIDE",
-  backendUrl: "",
+  backendUrl: "https://ai-guide-reader.khantech.workers.dev",
   defaultProvider: "gemini",
   googleClientId: "", // optional: your Google OAuth Client ID so visitors don't have to paste one
 
@@ -16,8 +16,10 @@ window.APP_CONFIG = {
    * APIs & Services → Credentials → this key:
    *   • Application restrictions → Websites → https://gim1203-hue.github.io/*
    *   • API restrictions → Generative Language API only
+   * Create it at https://aistudio.google.com/apikey. If the agent says "API key not valid",
+   * the key was deleted, mistyped or is the wrong kind of credential: make a new one there.
    * Never enable billing on this key's project. Visitors who add their own key in Settings use theirs instead. */
-  publicGeminiKey: "AQ.Ab8RN6IvvSwO7zNJJeHhz1GFoa9wwGEazXACwhYn4XO3O4KkNw",
+  publicGeminiKey: "",
   publicGeminiModel: "gemini-flash-lite-latest", // Flash-Lite has the highest free limits
 
   // The course: every lesson page the agent can search. Add new pages here.

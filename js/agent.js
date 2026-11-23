@@ -396,7 +396,16 @@ Style: concise (under ~150 words unless asked), Markdown allowed (bold, bullet l
         history = JSON.parse(checkpoint); // roll back so the conversation stays valid
         let hint = "";
         if (/credit|billing|quota|exhausted|429/i.test(err.message)) hint = "\nTip: use the free Google Gemini provider in ⚙ Settings, or wait a minute if you hit the free rate limit.";
-        else if (/auth|key|401|403|permission/i.test(err.message)) hint = "\nCheck your API key in ⚙ Settings.";
+        else if (/auth|key|401|403|permission/i.test(err.message)) {
+          // A key saved in Settings overrides the site's shared key, and it's saved per address
+          // (localhost and 127.0.0.1 are different), so an old or mistyped key breaks only one of them.
+          const p = App.cfg.provider();
+          hint = App.cfg.userKey(p) && (App.cfg.backend() || (p === "gemini" && window.APP_CONFIG?.publicGeminiKey))
+            ? "\nThe key saved in ⚙ Settings is being used instead of this site's shared key. Fix it, or empty the key box and click Save to use the shared key."
+            : App.cfg.usingSharedKey(p)
+              ? "\nThis site's shared key was rejected. Add your own free key in ⚙ Settings to keep going."
+              : "\nCheck your API key in ⚙ Settings.";
+        }
         addMsg("err", "Couldn't reach the AI: " + err.message + hint);
       } finally {
         busy = false; sendBtn.disabled = false; input.focus();
